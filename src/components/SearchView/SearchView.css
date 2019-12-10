@@ -1,0 +1,20 @@
+.search-view {
+    position: relative;
+    width: 100%;
+}
+
+.search-view__input {
+    width: 100%;
+}
+
+.search-view__dropdown-list {
+    list-style: none;
+    position: absolute;
+    top: 15px;
+    left: 0;
+    background-color: white;
+}
+
+.search-view__dropdown-list__li {
+    width: 100%;
+}

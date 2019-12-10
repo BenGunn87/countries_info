@@ -1,4 +1,4 @@
-import {ICountry} from "../type/common";
+import {ICountry} from "../type/common.type";
 
 const url = 'https://restcountries.eu/rest/v2';
 
