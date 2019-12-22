@@ -59,6 +59,7 @@ export class SearchView extends React.Component<ISearchViewProps> {
 
     private readonly store: SearchViewStore;
     private handlerReaction?: IReactionDisposer = undefined;
+    private toggleContainer = React.createRef<HTMLDivElement>();
 
     public constructor(props: ISearchViewProps) {
         super(props);
@@ -70,30 +71,39 @@ export class SearchView extends React.Component<ISearchViewProps> {
             list => {
                 this.store.setList(list);
             });
+        window.addEventListener('click', this.onClickOutsideHandler);
     }
 
     public componentWillUnmount() {
         if (this.handlerReaction) {
             this.handlerReaction();
         }
+        window.removeEventListener('click', this.onClickOutsideHandler);
     }
 
     public render () {
         const {showList, value, displayList} = this.store;
         const list = this.renderDisplayList(displayList);
         return <>
-            <div className="search-view">
+            <div className="search-view" ref={this.toggleContainer}>
                 <input
                     className="search-view__input"
                     value={value}
                     onChange={this.onChange}
                     onFocus={this.onInputFocus}
-                    onBlur={this.onInputBlur}
                 />
                 {showList && list}
             </div>
             </>
     }
+
+    private onClickOutsideHandler = (event: any) => { //  MouseEvent<HTMLElement>
+        if (this.store.showList
+            && this.toggleContainer.current
+            && !this.toggleContainer.current.contains(event.target)) {
+            this.store.setShowList(false);
+        }
+    };
 
     private onChange = (event: ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value ? event.target.value : '';
