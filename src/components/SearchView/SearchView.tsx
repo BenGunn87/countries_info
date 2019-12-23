@@ -129,11 +129,7 @@ export class SearchView extends React.Component<ISearchViewProps> {
     private onInputFocus = (event: FocusEvent<HTMLInputElement>) => {
         this.store.setShowList(true);
     };
-
-    private onInputBlur = (event: FocusEvent<HTMLInputElement>) => {
-        setTimeout(() => {this.store.setShowList(false)}, 100);
-    };
-
+    
     private onElementClick = (value: string, event: MouseEvent<HTMLLIElement>) => {
         this.store.setShowList(false);
         this.store.setValue('');
