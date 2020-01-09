@@ -1,7 +1,7 @@
-import React, {ChangeEvent, FocusEvent, MouseEvent} from "react";
+import React, {ChangeEvent, FocusEvent, MouseEvent, KeyboardEvent} from "react";
 import {ISearchViewProps} from "./SearchView.tyoe";
 import {observer} from "mobx-react";
-import {action, computed, IReactionDisposer, observable, reaction} from "mobx";
+import {action, computed, IReactionDisposer, observable, reaction, transaction} from 'mobx';
 import './SearchView.css';
 
 class SearchViewStore {
@@ -11,8 +11,14 @@ class SearchViewStore {
     public value: string = '';
     @observable
     public list: string[] = [];
+    @observable
+    public activeItem: string = '';
 
     @computed get displayList(): string[] {
+        if (this.value === '') {
+            return [];
+        }
+
         const searchValue = this.value.toUpperCase();
         const resultList = this.list.reduce((res, item) => {
             if (item.toUpperCase().includes(searchValue)) {
@@ -26,6 +32,9 @@ class SearchViewStore {
         return resultList;
     }
 
+    @computed get activeItemIndex(): number {
+        return this.displayList.indexOf(this.activeItem);
+    }
     private readonly maxCount: number = 10;
 
     public constructor(props: ISearchViewProps) {
@@ -38,16 +47,34 @@ class SearchViewStore {
     @action
     public setShowList = (flag: boolean) => {
         this.showList = flag;
+        this.activeItem = '';
     };
 
     @action
     public setValue = (value: string) => {
         this.value = value;
+        this.activeItem = '';
     };
 
     @action
     public setList = (list: string[]) => {
         this.list = list;
+        this.activeItem = '';
+    };
+
+    @action
+    public setActiveItem = (value: string) => {
+        this.activeItem = value;
+    };
+
+    @action
+    public moveActiveItem = (directions: number) => {
+        if (this.displayList.length > 0) {
+            const newIndex = this.activeItemIndex !== -1
+                ? (this.activeItemIndex + directions + this.displayList.length) % this.displayList.length
+                : directions === 1 ? 0 : this.displayList.length -1 ;
+            this.activeItem = this.displayList[newIndex];
+        }
     }
 }
 
@@ -60,6 +87,7 @@ export class SearchView extends React.Component<ISearchViewProps> {
     private readonly store: SearchViewStore;
     private handlerReaction?: IReactionDisposer = undefined;
     private toggleContainer = React.createRef<HTMLDivElement>();
+    private timeOutId?: number;
 
     public constructor(props: ISearchViewProps) {
         super(props);
@@ -71,37 +99,49 @@ export class SearchView extends React.Component<ISearchViewProps> {
             list => {
                 this.store.setList(list);
             });
-        window.addEventListener('click', this.onClickOutsideHandler);
-    }
-
-    public componentWillUnmount() {
-        if (this.handlerReaction) {
-            this.handlerReaction();
-        }
-        window.removeEventListener('click', this.onClickOutsideHandler);
     }
 
     public render () {
         const {showList, value, displayList} = this.store;
         const list = this.renderDisplayList(displayList);
         return <>
-            <div className="search-view" ref={this.toggleContainer}>
+            <div className="search-view"
+                 ref={this.toggleContainer}
+                 onFocus={this.onFocusHandler}
+                 onKeyUp={this.onKeyAction}
+            >
                 <input
                     className="search-view__input"
                     value={value}
                     onChange={this.onChange}
-                    onFocus={this.onInputFocus}
+                    onFocus={this.onInputFocusHandler}
+                    onBlur={this.onBlurHandler}
                 />
                 {showList && list}
             </div>
             </>
     }
 
-    private onClickOutsideHandler = (event: any) => { //  MouseEvent<HTMLElement>
-        if (this.store.showList
-            && this.toggleContainer.current
-            && !this.toggleContainer.current.contains(event.target)) {
-            this.store.setShowList(false);
+    private onKeyAction = (event: KeyboardEvent<HTMLInputElement>) => {
+        const {moveActiveItem} = this.store;
+        switch (event.key) {
+            case 'ArrowDown':
+                moveActiveItem(1);
+                break;
+            case 'ArrowUp':
+                moveActiveItem(-1);
+                break;
+            case 'Enter':
+                if (this.store.activeItem !== '') {
+                    this.selectElement(this.store.activeItem);
+                    if (this.toggleContainer && this.toggleContainer.current) {
+                        const input = this.toggleContainer.current.querySelector('input');
+                        if (input) {
+                            input.blur();
+                        }
+                    }
+                }
+                break;
         }
     };
 
@@ -117,7 +157,17 @@ export class SearchView extends React.Component<ISearchViewProps> {
             return (<ul className="search-view__dropdown-list">
                 {
                 displayList.map(item => {
-                    return <li key={item} onClick={this.onElementClick.bind(this, item)}>
+                    let liClassNames = 'search-view__dropdown-list__li';
+                    if (item === this.store.activeItem) {
+                        liClassNames += ' search-view__dropdown-list__li_active';
+                    }
+                    return <li
+                        key={item}
+                        onClick={this.onElementClickHandler.bind(this, item)}
+                        tabIndex={-1}
+                        className={liClassNames}
+                        onMouseOver={this.onElementMouseOverHandler.bind(this, item)}
+                    >
                         {item}
                     </li>
                 })}
@@ -126,16 +176,38 @@ export class SearchView extends React.Component<ISearchViewProps> {
         return null;
     };
 
-    private onInputFocus = (event: FocusEvent<HTMLInputElement>) => {
+    private onElementMouseOverHandler = (value: string, event: MouseEvent<HTMLLIElement>) => {
+        this.store.setActiveItem(value);
+    };
+
+    private onInputFocusHandler = (event: FocusEvent<HTMLInputElement>) => {
         this.store.setShowList(true);
     };
-    
-    private onElementClick = (value: string, event: MouseEvent<HTMLLIElement>) => {
-        this.store.setShowList(false);
-        this.store.setValue('');
+
+    private onFocusHandler = () => {
+        clearTimeout(this.timeOutId);
+    };
+
+    private onElementClickHandler = (value: string, event: MouseEvent<HTMLLIElement>) => {
+        this.selectElement(value);
+    };
+
+    private selectElement = (value : string) => {
+        transaction(() => {
+            this.store.setShowList(false);
+            this.store.setValue('');
+        });
         const {onListElementClick} = this.props;
         if (onListElementClick) {
             onListElementClick(value);
         }
+    };
+
+    private onBlurHandler = () => {
+        this.timeOutId = setTimeout(() => {
+            if (this.store.showList) {
+                this.store.setShowList(false);
+            }
+        });
     }
 }
