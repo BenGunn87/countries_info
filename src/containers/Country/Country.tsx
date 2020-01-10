@@ -1,12 +1,12 @@
-import React, {ChangeEvent} from 'react';
+import React from 'react';
 import {inject, observer} from "mobx-react";
 import {CountryView} from "../../components";
-import {ICountry} from "../../type/common.type";
+import {langLabel} from '../../utils/langLabel';
 import {ICountryProps} from "./Country.type";
-import {ICountryViewProps} from "../../components/CountryView/CountryView.type";
 import {SearchView} from "../../components/SearchView/SearchView";
+import './Country.css';
 
-@inject('countries')
+@inject('countriesStore')
 @observer
 export class Country extends React.Component<ICountryProps> {
     public constructor(props: ICountryProps) {
@@ -14,44 +14,24 @@ export class Country extends React.Component<ICountryProps> {
     }
 
     public componentDidMount(): void {
-        const {getCountryList} = this.props.countries!;
+        const {getCountryList} = this.props.countriesStore!;
         getCountryList();
     }
 
     public render() {
-        const {countryList, selectedCountry, setSelectedCountry} = this.props.countries!;
-
-        return (<>
-
-            <SearchView
-                list={countryList.map(({name}) => name)}
-                onChange={this.onSearchViewChange}
-                ref={(el) => el}
-                onListElementClick={setSelectedCountry}
-            />
-                <div>
-                    {selectedCountry &&
-                    <CountryView {...selectedCountry}/>}
-                </div>
-            </>
-        );
+        const {countryList, selectedCountry, setSelectedCountry} = this.props.countriesStore!;
+        return <div className="country">
+            <div className="country__search">
+                <SearchView
+                    list={countryList.map(({name}) => name)}
+                    onListElementSelect={setSelectedCountry}
+                    label={langLabel('Search')}
+                />
+            </div>
+            <div className="country__info">
+                {selectedCountry &&
+                <CountryView {...selectedCountry}/>}
+            </div>
+        </div>;
     }
-
-    private getCountryProp = (country: ICountry): ICountryViewProps | undefined => {
-        if (country) {
-            return {
-                name: country.name,
-                capital: country.capital,
-                flag: country.flag,
-                population: country.population,
-            };
-        }
-        return undefined;
-    };
-
-    private onSearchViewChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const {setSearchCountryValue} = this.props.countries!;
-        const value = e.target.value ? e.target.value : '';
-        setSearchCountryValue(value);
-    };
 }

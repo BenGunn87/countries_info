@@ -1,5 +1,5 @@
-import {Countries} from "../../stores/Countries";
+import {CountriesStore} from "../../stores/CountriesStore";
 
 export interface ICountryProps {
-    countries?: Countries;
+    countriesStore?: CountriesStore;
 }

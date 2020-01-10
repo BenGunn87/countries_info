@@ -1,0 +1,11 @@
+.country {
+    width: 70%;
+}
+.country__search {
+    padding: 10px;
+    background-color: bisque;
+    margin-bottom: 10px;
+}
+.country__info {
+
+}

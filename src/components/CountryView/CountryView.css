@@ -1,0 +1,12 @@
+.country-info {
+    display: flex;
+    flex-wrap: wrap;
+}
+.country-info__flag {
+    min-width: 100px;
+    max-width: 300px;
+}
+.country-info__description-container {
+    flex-grow: 1;
+    margin-left: 10px;
+}

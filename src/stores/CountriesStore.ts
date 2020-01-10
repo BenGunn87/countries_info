@@ -2,17 +2,14 @@ import {ICountry} from "../type/common.type";
 import {getAllCountries} from "../api/restcountries";
 import {action, observable} from "mobx";
 
-export class Countries {
+export class CountriesStore {
     @observable
     public countryList: ICountry[];
-    @observable
-    public searchCountryValue: string;
     @observable
     public selectedCountry?: ICountry;
 
     public constructor() {
         this.countryList = [];
-        this.searchCountryValue = '';
     }
 
     public getCountryList = async () => {
@@ -23,11 +20,6 @@ export class Countries {
     @action
     public setCountryList = (arr: ICountry[]) => {
         this.countryList = arr;
-    };
-
-    @action
-    public setSearchCountryValue = (value: string) => {
-        this.searchCountryValue = value;
     };
 
     @action

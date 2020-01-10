@@ -1,8 +1,11 @@
-import {Countries} from "./Countries";
+import {CountriesStore} from './CountriesStore';
+import {CommonStore} from './СommonStore';
 
-export const countries = new Countries();
+export const countriesStore = new CountriesStore();
+export const commonStore = new CommonStore();
 
 export const store = {
-    countries,
+    countriesStore,
+    commonStore,
 };
 

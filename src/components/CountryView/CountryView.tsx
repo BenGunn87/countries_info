@@ -1,6 +1,8 @@
 import React from "react";
+import {langLabel} from '../../utils/langLabel';
 import {ICountryViewProps} from "./CountryView.type";
 import {observer} from "mobx-react";
+import './CountryView.css';
 
 @observer
 export class CountryView extends React.Component<ICountryViewProps> {
@@ -16,25 +18,24 @@ export class CountryView extends React.Component<ICountryViewProps> {
             capital
         } = this.props;
         return (
-            <>
-                {name && <div>
-                    {name}
-                </div>}
+            <section className="country-info">
                 {flag &&
-                <div>
-                    {flag}
-                </div>
+                <img src={flag} alt={langLabel('Flag')} className="country-info__flag"/>
                 }
-                {population &&
+                <div className="country-info__description-container">
+                    {name && <div>
+                        {langLabel('Country')}: {name}
+                    </div>}
+                    {capital &&
                     <div>
-                        {population}
-                    </div>
-                }
-                {capital &&
-                <div>
-                    {capital}
-                </div>}
-            </>
+                        {langLabel('Capital')}: {capital}
+                    </div>}
+                    {population &&
+                    <div>
+                        {langLabel('Population')}: {population}
+                    </div>}
+                </div>
+            </section>
         );
     }
 }

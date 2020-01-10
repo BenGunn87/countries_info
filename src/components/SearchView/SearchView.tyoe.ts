@@ -1,9 +1,8 @@
-import {ChangeEventHandler} from "react";
-
 export interface ISearchViewProps {
     searchValue?: string;
     list: string[];
-    onChange: ChangeEventHandler<HTMLInputElement>;
+    onChange?: (value: string) => void;
     maxCount?: number;
-    onListElementClick?: (value: string) => void;
+    onListElementSelect?: (value: string) => void;
+    label?: string;
 }
