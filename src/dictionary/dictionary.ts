@@ -2,6 +2,7 @@ import {IDictionary} from '../type/common.type';
 
 export const langLabel: IDictionary = {
 	en: {
+		name: 'English',
 		translation: {
 			Flag: 'Flag',
 			Country: 'Country',
@@ -12,7 +13,8 @@ export const langLabel: IDictionary = {
 		}
 	},
 	ru: {
-		'translation': {
+		name: 'Русский',
+		translation: {
 			Flag: 'Флаг',
 			Country: 'Страна',
 			Population: 'Население',
@@ -21,6 +23,7 @@ export const langLabel: IDictionary = {
 		}
 	},
 	fr: {
+		name: 'Française',
 		'translation': {
 			Flag: 'Drapeau',
 			Country: 'Pays',

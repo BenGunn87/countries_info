@@ -4,8 +4,8 @@ import {IDictionary} from "../../type/common.type";
 
 export const LanguageSelect: React.FunctionComponent = () => {
     const {setCurrentLanguage, currentLanguage, dictionary} = languageStore;
-    const optionList = Object.entries(dictionary).map(([key]) => {
-        return <option value={key} key={key}>{key}</option>
+    const optionList = Object.entries(dictionary).map(([key, value]) => {
+        return <option value={key} key={key}>{value.name}</option>
     });
 
     return <select

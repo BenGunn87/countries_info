@@ -15,7 +15,8 @@ export interface IKeyValue {
 }
 
 export interface ILangLabels {
-    translation: {[identifier: string]: string}
+    translation: {[identifier: string]: string},
+    name: string
 }
 
 export interface IDictionary {

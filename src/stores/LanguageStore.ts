@@ -26,7 +26,7 @@ export class LanguageStore  {
 	@computed
 	get currentLangLabels(): ILangLabels {
 		const tmpLang = langLabel[this.currentLanguage];
-		return tmpLang ? tmpLang : {translation: {}};
+		return tmpLang ? tmpLang : {translation: {}, name: ''};
 	}
 
 	@action

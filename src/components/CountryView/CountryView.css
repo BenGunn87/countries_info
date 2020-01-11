@@ -17,3 +17,7 @@
     margin: 0;
     padding-left: 30px;
 }
+.country-info__borders-item {
+    cursor: pointer;
+}
+

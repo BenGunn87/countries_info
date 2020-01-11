@@ -48,12 +48,16 @@ export class CountryView extends React.Component<ICountryViewProps> {
             const {countryList, setSelectedCountry} = this.props;
             const borderCountryList = borders.map(key => {
                 const country = countryList.find(({alpha3Code}) => alpha3Code === key);
-                return <li key={key} onClick={() => setSelectedCountry(key)}>
+                return <li
+                    key={key}
+                    onClick={() => setSelectedCountry(key)}
+                    className="country-info__borders-item"
+                >
                     {country ? country.name : key}
                 </li>
             });
             return <div>
-                {langLabel('Borders')}
+                {langLabel('Borders')}:
                 <ul className="country-info__borders-list">
                     {borderCountryList}
                 </ul>
