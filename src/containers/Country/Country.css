@@ -1,11 +1,24 @@
 .country {
     width: 70%;
+    max-width: 1024px;
 }
-.country__search {
+.country__bar {
     padding: 10px;
     background-color: bisque;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
+.country__search {
+    flex-grow: 1;
+}
+
+.country__lang {
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
 .country__info {
 
 }

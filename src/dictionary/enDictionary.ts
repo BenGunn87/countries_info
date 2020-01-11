@@ -1,5 +1,7 @@
-export default
-{
+import {ILangLabels} from "../type/common.type";
+
+export const enLabel: ILangLabels =
+	{
 	"translation": {
 		"Flag": "Flag",
 		"Country": "Country",
@@ -7,4 +9,4 @@ export default
 		"Capital": "Capital",
 		"Search": "Search"
 	}
-}
+};

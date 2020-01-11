@@ -1,4 +1,6 @@
-export default
+import {ILangLabels} from "../type/common.type";
+
+export const ruLabel: ILangLabels =
 {
 	"translation": {
 		"Flag": "Флаг",
@@ -7,4 +9,4 @@ export default
 		"Capital": "Сталица",
 		"Search": "Поиск"
 	}
-}
+};

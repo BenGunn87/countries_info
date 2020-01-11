@@ -7,14 +7,21 @@ export class CountriesStore {
     public countryList: ICountry[];
     @observable
     public selectedCountry?: ICountry;
+    @observable
+    public isLoad: boolean = true;
 
     public constructor() {
         this.countryList = [];
     }
 
     public getCountryList = async () => {
-        const CountryList = await getAllCountries();
-        this.setCountryList(CountryList);
+        try {
+            this.isLoad = false;
+            const CountryList = await getAllCountries();
+            this.setCountryList(CountryList);
+        } finally {
+            this.isLoad = true;
+        }
     };
 
     @action

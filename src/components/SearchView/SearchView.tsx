@@ -107,17 +107,12 @@ export class SearchView extends React.Component<ISearchViewProps> {
         const {label} = this.props;
 
         const list = this.renderDisplayList(displayList);
-        return <>
+        return (
             <div className="search-view"
                  ref={this.toggleContainer}
                  onFocus={this.onFocusHandler}
                  onKeyUp={this.onKeyAction}
             >
-                {
-                    label && <label className="search-view__label">
-                        {label}
-                    </label>
-                }
                 <div className="search-view__input-container">
                     <input
                         className="search-view__input"
@@ -126,11 +121,11 @@ export class SearchView extends React.Component<ISearchViewProps> {
                         onChange={this.onChange}
                         onFocus={this.onInputFocusHandler}
                         onBlur={this.onBlurHandler}
+                        placeholder={label}
                     />
                     {showList && list}
                 </div>
-            </div>
-            </>
+            </div>)
     }
 
     private onKeyAction = (event: KeyboardEvent<HTMLInputElement>) => {

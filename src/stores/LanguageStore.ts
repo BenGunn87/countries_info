@@ -1,14 +1,16 @@
 import {action, computed, observable} from 'mobx';
 import {ILangLabels, Language} from '../type/common.type';
-import ruLabel from '../JSON/ru.json';
-import enLabel from '../JSON/en.json';
+import {ruLabel} from '../dictionary/ruDictionary';
+import {enLabel} from '../dictionary/enDictionary';
 
-export class CommonStore {
+export class LanguageStore  {
 	@observable
 	public currentLanguage: Language;
+	public defaultLangLabels: ILangLabels;
 
 	public constructor(defaultLang : Language = Language.ru) {
 		this.currentLanguage = defaultLang;
+		this.defaultLangLabels = enLabel;
 	}
 
 	@computed
@@ -22,8 +24,6 @@ export class CommonStore {
 		}
 		return {translation: {}}
 	}
-
-	public defaultLangLabels: ILangLabels = enLabel as ILangLabels;
 
 	@action
 	public setCurrentLanguage = (lang: Language) => {

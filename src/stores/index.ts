@@ -1,11 +1,11 @@
 import {CountriesStore} from './CountriesStore';
-import {CommonStore} from './СommonStore';
+import {LanguageStore} from './LanguageStore';
 
 export const countriesStore = new CountriesStore();
-export const commonStore = new CommonStore();
+export const languageStore = new LanguageStore();
 
 export const store = {
     countriesStore,
-    commonStore,
+    languageStore,
 };
 

@@ -5,6 +5,7 @@
 .country-info__flag {
     min-width: 100px;
     max-width: 300px;
+    border: 1px solid #000000;
 }
 .country-info__description-container {
     flex-grow: 1;

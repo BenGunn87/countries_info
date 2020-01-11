@@ -1,23 +1,15 @@
 .search-view {
     width: 100%;
-    display: flex;
+    min-width: 50px;
 }
 
 .search-view__input-container {
-    flex-grow: 1;
-    min-width: 50px;
     position: relative;
 }
 
 .search-view__input {
     width: 100%;
 }
-
-.search-view__label {
-    flex-shrink: 0;
-    margin-right: 10px;
-}
-
 .search-view__dropdown-list {
     list-style: none;
     position: absolute;
@@ -25,7 +17,8 @@
     left: 0;
     background-color: white;
     width: 100%;
-    padding: 5px;
+    padding-left: 5px;
+    box-shadow: 0 2px 2px 2px #AAAAAA;
 }
 
 .search-view__li {

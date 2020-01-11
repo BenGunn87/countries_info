@@ -8,6 +8,7 @@ export interface ICountry {
 export interface ILangLabels {
     translation: {[identifier: string]: string}
 }
+
 export enum Language {
     'ru' = 'Русский',
     'en' = 'Английский',
