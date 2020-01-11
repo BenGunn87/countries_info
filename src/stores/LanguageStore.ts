@@ -1,32 +1,42 @@
-import {action, computed, observable} from 'mobx';
-import {ILangLabels, Language} from '../type/common.type';
-import {ruLabel} from '../dictionary/ruDictionary';
-import {enLabel} from '../dictionary/enDictionary';
+import {action, autorun, computed, observable} from 'mobx';
+import {IDictionary, ILangLabels} from '../type/common.type';
+import {langLabel} from '../dictionary/dictionary';
+
+const KEY_TO_LANG = 'lang';
+const DEFAULT_LANG = 'en';
+
 
 export class LanguageStore  {
 	@observable
-	public currentLanguage: Language;
+	public currentLanguage: keyof IDictionary;
 	public defaultLangLabels: ILangLabels;
+	public dictionary: IDictionary;
 
-	public constructor(defaultLang : Language = Language.ru) {
-		this.currentLanguage = defaultLang;
-		this.defaultLangLabels = enLabel;
+	public constructor() {
+		let saveLang = window.localStorage.getItem(KEY_TO_LANG) as keyof IDictionary | null;
+		if (!saveLang) {
+			saveLang = DEFAULT_LANG;
+			window.localStorage.setItem(KEY_TO_LANG, saveLang);
+		}
+		this.currentLanguage = saveLang;
+		this.defaultLangLabels = langLabel[DEFAULT_LANG];
+		this.dictionary = langLabel;
 	}
 
 	@computed
 	get currentLangLabels(): ILangLabels {
-
-		switch (this.currentLanguage) {
-			case Language.ru:
-				return ruLabel as ILangLabels;
-			case Language.en:
-				return enLabel as ILangLabels;
-		}
-		return {translation: {}}
+		const tmpLang = langLabel[this.currentLanguage];
+		return tmpLang ? tmpLang : {translation: {}};
 	}
 
 	@action
-	public setCurrentLanguage = (lang: Language) => {
+	public setCurrentLanguage = (lang: keyof IDictionary) => {
 		this.currentLanguage = lang;
-	}
+	};
+
+	private setLangToLocalStorage = autorun(() => {
+		if (this.currentLanguage) {
+			window.localStorage.setItem(KEY_TO_LANG, this.currentLanguage);
+		}
+	})
 }

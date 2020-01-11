@@ -1,31 +1,28 @@
-import React, {ChangeEvent, FocusEvent, MouseEvent, KeyboardEvent} from "react";
-import {ISearchViewProps} from "./SearchView.tyoe";
+import React, {ChangeEvent, KeyboardEvent} from "react";
+import {ISearchViewProps} from "./SearchView.type";
 import {observer} from "mobx-react";
 import {action, computed, IReactionDisposer, observable, reaction, transaction} from 'mobx';
+import {IKeyValue} from "../../type/common.type";
 import './SearchView.css';
 
 class SearchViewStore {
+    private readonly maxCount: number = 10;
+
     @observable
     public showList: boolean = false;
     @observable
     public value: string = '';
     @observable
-    public list: string[] = [];
+    public list: IKeyValue[] = [];
     @observable
-    public activeItem: string = '';
+    public activeItemKey: string = '';
 
-    @computed get displayList(): string[] {
+    @computed get displayList(): IKeyValue[] {
         if (this.value === '') {
             return [];
         }
-
         const searchValue = this.value.toUpperCase();
-        const resultList = this.list.reduce((res, item) => {
-            if (item.toUpperCase().includes(searchValue)) {
-                res.push(item);
-            }
-            return res;
-        }, [] as string[]);
+        const resultList = this.list.filter(({value}) => value.toUpperCase().includes(searchValue));
         if (resultList.length > this.maxCount) {
             resultList.length = this.maxCount;
         }
@@ -33,9 +30,8 @@ class SearchViewStore {
     }
 
     @computed get activeItemIndex(): number {
-        return this.displayList.indexOf(this.activeItem);
+        return this.displayList.findIndex(({key}) => key === this.activeItemKey);
     }
-    private readonly maxCount: number = 10;
 
     public constructor(props: ISearchViewProps) {
         if (props.maxCount) {
@@ -47,24 +43,24 @@ class SearchViewStore {
     @action
     public setShowList = (flag: boolean) => {
         this.showList = flag;
-        this.activeItem = '';
+        this.activeItemKey = '';
     };
 
     @action
     public setValue = (value: string) => {
         this.value = value;
-        this.activeItem = '';
+        this.activeItemKey = '';
     };
 
     @action
-    public setList = (list: string[]) => {
+    public setList = (list: IKeyValue[]) => {
         this.list = list;
-        this.activeItem = '';
+        this.activeItemKey = '';
     };
 
     @action
-    public setActiveItem = (value: string) => {
-        this.activeItem = value;
+    public setActiveItemKey = (key: string) => {
+        this.activeItemKey = key;
     };
 
     @action
@@ -73,7 +69,7 @@ class SearchViewStore {
             const newIndex = this.activeItemIndex !== -1
                 ? (this.activeItemIndex + directions + this.displayList.length) % this.displayList.length
                 : directions === 1 ? 0 : this.displayList.length -1 ;
-            this.activeItem = this.displayList[newIndex];
+            this.activeItemKey = this.displayList[newIndex].key;
         }
     }
 }
@@ -138,8 +134,8 @@ export class SearchView extends React.Component<ISearchViewProps> {
                 moveActiveItem(-1);
                 break;
             case 'Enter':
-                if (this.store.activeItem !== '') {
-                    this.selectElement(this.store.activeItem);
+                if (this.store.activeItemKey !== '') {
+                    this.selectElement(this.store.activeItemKey);
                     if (this.inputRef.current) {
                         this.inputRef.current.blur();
                     }
@@ -162,23 +158,23 @@ export class SearchView extends React.Component<ISearchViewProps> {
         }
     };
 
-    private renderDisplayList = (displayList: string[]) => {
+    private renderDisplayList = (displayList: IKeyValue[]) => {
         if (displayList.length > 0) {
             return (<ul className="search-view__dropdown-list">
                 {
-                displayList.map(item => {
+                displayList.map(({key, value}) => {
                     let liClassNames = 'search-view__li';
-                    if (item === this.store.activeItem) {
+                    if (key === this.store.activeItemKey) {
                         liClassNames += ' search-view__li_active';
                     }
                     return <li
-                        key={item}
-                        onClick={this.onElementClickHandler.bind(this, item)}
+                        key={key}
+                        onClick={this.onElementClickHandler.bind(this, key)}
                         tabIndex={-1}
                         className={liClassNames}
-                        onMouseOver={this.onElementMouseOverHandler.bind(this, item)}
+                        onMouseOver={this.onElementMouseOverHandler.bind(this, key)}
                     >
-                        {item}
+                        {value}
                     </li>
                 })}
             </ul>);
@@ -186,11 +182,11 @@ export class SearchView extends React.Component<ISearchViewProps> {
         return null;
     };
 
-    private onElementMouseOverHandler = (value: string, event: MouseEvent<HTMLLIElement>) => {
-        this.store.setActiveItem(value);
+    private onElementMouseOverHandler = (key: string) => {
+        this.store.setActiveItemKey(key);
     };
 
-    private onInputFocusHandler = (event: FocusEvent<HTMLInputElement>) => {
+    private onInputFocusHandler = () => {
         this.store.setShowList(true);
     };
 
@@ -198,18 +194,18 @@ export class SearchView extends React.Component<ISearchViewProps> {
         clearTimeout(this.timeOutId);
     };
 
-    private onElementClickHandler = (value: string, event: MouseEvent<HTMLLIElement>) => {
-        this.selectElement(value);
+    private onElementClickHandler = (key: string) => {
+        this.selectElement(key);
     };
 
-    private selectElement = (value : string) => {
+    private selectElement = (key : string) => {
         transaction(() => {
             this.store.setShowList(false);
             this.store.setValue('');
         });
         const {onListElementSelect} = this.props;
         if (onListElementSelect) {
-            onListElementSelect(value);
+            onListElementSelect(key);
         }
     };
 

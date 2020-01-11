@@ -1,19 +1,21 @@
 import {languageStore} from '../../stores';
 import React from "react";
-import {Language} from "../../type/common.type";
+import {IDictionary} from "../../type/common.type";
 
 export const LanguageSelect: React.FunctionComponent = () => {
-    const {setCurrentLanguage, currentLanguage} = languageStore;
+    const {setCurrentLanguage, currentLanguage, dictionary} = languageStore;
+    const optionList = Object.entries(dictionary).map(([key]) => {
+        return <option value={key} key={key}>{key}</option>
+    });
 
     return <select
         value={currentLanguage}
         onChange={
             (event) => {
-                setCurrentLanguage(event.target.value as Language);
+                setCurrentLanguage(event.target.value as keyof IDictionary);
             }
         }
     >
-        <option value={Language.ru}>ru</option>
-        <option value={Language.en}>en</option>
+        {optionList}
     </select>
 };

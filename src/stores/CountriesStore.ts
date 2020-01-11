@@ -30,7 +30,7 @@ export class CountriesStore {
     };
 
     @action
-    public setSelectedCountry = (value: string) => {
-        this.selectedCountry = this.countryList.find(country => country.name === value);
+    public setSelectedCountry = (key: string) => {
+        this.selectedCountry = this.countryList.find(country => country.alpha3Code === key);
     };
 }

@@ -15,8 +15,11 @@ export class CountryView extends React.Component<ICountryViewProps> {
             name,
             flag,
             population,
-            capital
+            capital,
+            borders,
         } = this.props;
+
+        const bordersList = this.renderBordersList(borders);
         return (
             <section className="country-info">
                 {flag &&
@@ -34,8 +37,28 @@ export class CountryView extends React.Component<ICountryViewProps> {
                     <div>
                         {langLabel('Population')}: {population}
                     </div>}
+                    {bordersList}
                 </div>
             </section>
         );
     }
+
+    private renderBordersList = (borders?: string[]) => {
+        if (borders && borders.length > 0) {
+            const {countryList, setSelectedCountry} = this.props;
+            const borderCountryList = borders.map(key => {
+                const country = countryList.find(({alpha3Code}) => alpha3Code === key);
+                return <li key={key} onClick={() => setSelectedCountry(key)}>
+                    {country ? country.name : key}
+                </li>
+            });
+            return <div>
+                {langLabel('Borders')}
+                <ul className="country-info__borders-list">
+                    {borderCountryList}
+                </ul>
+            </div>
+        }
+        return null;
+    };
 }

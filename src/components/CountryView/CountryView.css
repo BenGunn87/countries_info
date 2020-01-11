@@ -3,11 +3,17 @@
     flex-wrap: wrap;
 }
 .country-info__flag {
-    min-width: 100px;
+    min-width: 200px;
     max-width: 300px;
     border: 1px solid #000000;
+    margin-bottom: auto;
 }
 .country-info__description-container {
     flex-grow: 1;
+    flex-basis: 200px;
     margin-left: 10px;
+}
+.country-info__borders-list {
+    margin: 0;
+    padding-left: 30px;
 }

@@ -7,8 +7,7 @@
     background-color: bisque;
     margin-bottom: 10px;
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    min-width: 200px;
 }
 .country__search {
     flex-grow: 1;

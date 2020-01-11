@@ -28,7 +28,7 @@ export class Country extends React.Component<ICountryProps> {
             <div className="country__bar">
                 <div className="country__search">
                     <SearchView
-                        list={countryList.map(({name}) => name)}
+                        list={countryList.map(({name, alpha3Code}) => {return {key: alpha3Code, value: name}})}
                         onListElementSelect={setSelectedCountry}
                         label={langLabel('Search')}
                     />
@@ -39,7 +39,10 @@ export class Country extends React.Component<ICountryProps> {
             </div>
             <div className="country__info">
                 {selectedCountry &&
-                <CountryView {...selectedCountry}/>}
+                <CountryView {...selectedCountry}
+                             setSelectedCountry={setSelectedCountry}
+                             countryList={countryList}
+                />}
             </div>
         </div>;
     }
