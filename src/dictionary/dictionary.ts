@@ -20,6 +20,7 @@ export const langLabel: IDictionary = {
 			Population: 'Население',
 			Capital: 'Столица',
 			Search: 'Поиск',
+			Borders: 'Граница',
 		}
 	},
 	fr: {
