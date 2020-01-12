@@ -1,11 +1,15 @@
 import React, {ChangeEvent, KeyboardEvent} from "react";
-import {ISearchViewProps} from "./SearchView.type";
+import {Direction, ISearchViewProps} from "./SearchView.type";
 import {observer} from "mobx-react";
 import {action, computed, IReactionDisposer, observable, reaction, transaction} from 'mobx';
 import {IKeyValue} from "../../type/common.type";
 import './SearchView.css';
 
+/**
+ * Store для компонента поиска
+ */
 class SearchViewStore {
+    // максимальное количество значений в выпадающем списке
     private readonly maxCount: number = 10;
 
     @observable
@@ -21,8 +25,8 @@ class SearchViewStore {
         if (this.value === '') {
             return [];
         }
-        const searchValue = this.value.toUpperCase();
-        const resultList = this.list.filter(({value}) => value.toUpperCase().includes(searchValue));
+
+        const resultList = this.list.filter(({value}) => value.toUpperCase().includes(this.value.toUpperCase()));
         if (resultList.length > this.maxCount) {
             resultList.length = this.maxCount;
         }
@@ -40,40 +44,69 @@ class SearchViewStore {
         this.list = props.list;
     }
 
+    /**
+     * Метод для задания видимости выпадающего списка
+     *
+     * @param {boolean} flag - флаг
+     */
     @action
     public setShowList = (flag: boolean) => {
         this.showList = flag;
         this.activeItemKey = '';
     };
 
+    /**
+     * Метод для задания введенного значения
+     *
+     * @param {string} value - значение
+     */
     @action
     public setValue = (value: string) => {
         this.value = value;
         this.activeItemKey = '';
     };
 
+    /**
+     * Метод для задания списка значений для выбора
+     *
+     * @param {IKeyValue[]} list - список значений для выбора
+     */
     @action
     public setList = (list: IKeyValue[]) => {
         this.list = list;
         this.activeItemKey = '';
     };
 
+    /**
+     * Метод для задания выделенного значения из списка
+     *
+     * @param {string} key - ключ
+     */
     @action
     public setActiveItemKey = (key: string) => {
         this.activeItemKey = key;
     };
 
+    /**
+     * Метод для смещения указателя на выделенное значения
+     *
+     * @param {Direction} direction - направление смещения
+     */
     @action
-    public moveActiveItem = (directions: number) => {
+    public moveActiveItem = (direction: Direction) => {
         if (this.displayList.length > 0) {
+            const step = direction === Direction.up ? -1 : 1;
             const newIndex = this.activeItemIndex !== -1
-                ? (this.activeItemIndex + directions + this.displayList.length) % this.displayList.length
-                : directions === 1 ? 0 : this.displayList.length -1 ;
+                ? (this.activeItemIndex + step + this.displayList.length) % this.displayList.length
+                : direction === Direction.down ? 0 : this.displayList.length - 1 ;
             this.activeItemKey = this.displayList[newIndex].key;
         }
     }
 }
 
+/**
+ * Компонент для поиска в списке значений
+ */
 @observer
 export class SearchView extends React.Component<ISearchViewProps> {
     public static defaultProps = {
@@ -102,7 +135,7 @@ export class SearchView extends React.Component<ISearchViewProps> {
         const {showList, value, displayList} = this.store;
         const {label} = this.props;
 
-        const list = this.renderDisplayList(displayList);
+        const list = showList ? this.renderDisplayList(displayList) : null;
         return (
             <div className="search-view"
                  ref={this.toggleContainer}
@@ -114,9 +147,9 @@ export class SearchView extends React.Component<ISearchViewProps> {
                         className="search-view__input"
                         ref={this.inputRef}
                         value={value}
-                        onChange={this.onChange}
+                        onChange={this.onChangeHandler}
                         onFocus={this.onInputFocusHandler}
-                        onBlur={this.onBlurHandler}
+                        onBlur={this.onInputBlurHandler}
                         placeholder={label}
                     />
                     {showList && list}
@@ -124,18 +157,23 @@ export class SearchView extends React.Component<ISearchViewProps> {
             </div>)
     }
 
+    /**
+     * Метод для обработки нажатия клавиш
+     *
+     * @param {KeyboardEvent<HTMLInputElement>} event - событие
+     */
     private onKeyAction = (event: KeyboardEvent<HTMLInputElement>) => {
         const {moveActiveItem} = this.store;
         switch (event.key) {
             case 'ArrowDown':
-                moveActiveItem(1);
+                moveActiveItem(Direction.down);
                 break;
             case 'ArrowUp':
-                moveActiveItem(-1);
+                moveActiveItem(Direction.up);
                 break;
             case 'Enter':
                 if (this.store.activeItemKey !== '') {
-                    this.selectElement(this.store.activeItemKey);
+                    this.selectItem(this.store.activeItemKey);
                     if (this.inputRef.current) {
                         this.inputRef.current.blur();
                     }
@@ -149,15 +187,50 @@ export class SearchView extends React.Component<ISearchViewProps> {
         }
     };
 
-    private onChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value ? event.target.value : '';
+    /**
+     * Метод для обработки вводы значения в input
+     *
+     * @param {ChangeEvent<HTMLInputElement>} event - событие
+     */
+    private onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const {onChange} = this.props;
+        const value = event.target.value ? event.target.value : '';
         this.store.setValue(value);
         if (onChange) {
             onChange(value);
         }
     };
 
+    /**
+     * Метод для обработки установки фокуса на компоненте SearchView
+     */
+    private onFocusHandler = () => {
+        clearTimeout(this.timeOutId);
+    };
+
+    /**
+     * Метод для обработки потери фокуса input-ом
+     */
+    private onInputBlurHandler = () => {
+        this.timeOutId = setTimeout(() => {
+            if (this.store.showList) {
+                this.store.setShowList(false);
+            }
+        });
+    };
+
+    /**
+     * Метод для обработки установки фокуса на input
+     */
+    private onInputFocusHandler = () => {
+        this.store.setShowList(true);
+    };
+
+    /**
+     * Метод для рендера выпадающего списка
+     *
+     * @param {IKeyValue[]} displayList - значения для выпадающего списка
+     */
     private renderDisplayList = (displayList: IKeyValue[]) => {
         if (displayList.length > 0) {
             return (<ul className="search-view__dropdown-list">
@@ -182,38 +255,38 @@ export class SearchView extends React.Component<ISearchViewProps> {
         return null;
     };
 
+    /**
+     * Метод для обработки наведения курсора на элемент списка
+     *
+     * @param {string} key - ключ элемента
+     */
     private onElementMouseOverHandler = (key: string) => {
         this.store.setActiveItemKey(key);
     };
 
-    private onInputFocusHandler = () => {
-        this.store.setShowList(true);
-    };
-
-    private onFocusHandler = () => {
-        clearTimeout(this.timeOutId);
-    };
-
+    /**
+     * Метод для обработки нажатия на элимент списка
+     *
+     * @param {string} key - ключ элимента
+     */
     private onElementClickHandler = (key: string) => {
-        this.selectElement(key);
+        this.selectItem(key);
     };
 
-    private selectElement = (key : string) => {
+    /**
+     * Методя для обработки выбора элемента
+     *
+     * @param {string} key - ключ элемента
+     */
+    private selectItem = (key : string) => {
+        const {onListElementSelect} = this.props;
+
         transaction(() => {
             this.store.setShowList(false);
             this.store.setValue('');
         });
-        const {onListElementSelect} = this.props;
         if (onListElementSelect) {
             onListElementSelect(key);
         }
     };
-
-    private onBlurHandler = () => {
-        this.timeOutId = setTimeout(() => {
-            if (this.store.showList) {
-                this.store.setShowList(false);
-            }
-        });
-    }
 }

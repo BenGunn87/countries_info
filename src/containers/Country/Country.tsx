@@ -3,10 +3,13 @@ import {inject, observer} from "mobx-react";
 import {CountryView} from "../../components";
 import {langLabel} from '../../utils/langLabel';
 import {ICountryProps} from "./Country.type";
-import {SearchView} from "../../components/SearchView/SearchView";
-import {LanguageSelect} from '../../components/LanguageSelect/LanguageSelect';
+import {SearchView} from "../../components";
+import {LanguageSelect} from '../../components';
 import './Country.css';
 
+/**
+ * Компонент для отображения строки поиска и карточки страны
+ */
 @inject('countriesStore')
 @observer
 export class Country extends React.Component<ICountryProps> {

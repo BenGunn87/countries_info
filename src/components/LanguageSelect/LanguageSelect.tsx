@@ -3,6 +3,9 @@ import {IDictionary} from "../../type/common.type";
 import {inject, observer} from "mobx-react";
 import {LanguageStore} from "../../stores/LanguageStore";
 
+/**
+ * Компонент для выбора языка интерфейса
+ */
 export const LanguageSelect = inject('languageStore') (observer((props: {languageStore?: LanguageStore}) => {
     const {setCurrentLanguage, currentLanguage, dictionary} = props.languageStore!;
     const optionList = Object.entries(dictionary).map(([key, value]) => {

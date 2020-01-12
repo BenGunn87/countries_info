@@ -1,14 +1,19 @@
-import {action, autorun, computed, observable} from 'mobx';
+import {action, computed, observable} from 'mobx';
 import {IDictionary, ILangLabels} from '../type/common.type';
 import {langLabel} from '../dictionary/dictionary';
 
+// Ключ для хранения выбранного языка в localStorage
 const KEY_TO_LANG = 'lang';
+// Язык по умолчанию
 const DEFAULT_LANG = 'en';
 
-
+/**
+ * Store для хранения информации о языке интерфейса
+ */
 export class LanguageStore  {
 	@observable
 	public currentLanguage: keyof IDictionary;
+
 	public defaultLangLabels: ILangLabels;
 	public dictionary: IDictionary;
 
@@ -29,14 +34,13 @@ export class LanguageStore  {
 		return tmpLang ? tmpLang : {translation: {}, name: ''};
 	}
 
+	/**
+	 * Метод для задания языка интерфейса
+	 *
+	 * @param {keyof IDictionary} lang - язык
+	 */
 	@action
 	public setCurrentLanguage = (lang: keyof IDictionary) => {
 		this.currentLanguage = lang;
 	};
-
-	private setLangToLocalStorage = autorun(() => {
-		if (this.currentLanguage) {
-			window.localStorage.setItem(KEY_TO_LANG, this.currentLanguage);
-		}
-	})
 }

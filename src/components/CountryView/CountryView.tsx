@@ -4,6 +4,9 @@ import {ICountryViewProps} from "./CountryView.type";
 import {observer} from "mobx-react";
 import './CountryView.css';
 
+/**
+ * Компонент для отображения карточки страны
+ */
 @observer
 export class CountryView extends React.Component<ICountryViewProps> {
     public constructor(props: ICountryViewProps) {
@@ -43,6 +46,11 @@ export class CountryView extends React.Component<ICountryViewProps> {
         );
     }
 
+    /**
+     * Метод для рендера списка граничных стран
+     *
+     * @param {string[]} borders - массив с кода граничных стран
+     */
     private renderBordersList = (borders?: string[]) => {
         if (borders && borders.length > 0) {
             const {countryList, setSelectedCountry} = this.props;
@@ -51,7 +59,7 @@ export class CountryView extends React.Component<ICountryViewProps> {
                 return <li
                     key={key}
                     onClick={() => setSelectedCountry(key)}
-                    className="country-info__borders-item"
+                    className="country-info__borders-list-item"
                 >
                     {country ? country.name : key}
                 </li>

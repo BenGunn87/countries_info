@@ -12,12 +12,10 @@
 .country__search {
     flex-grow: 1;
 }
-
 .country__lang {
     margin-left: 10px;
     flex-shrink: 0;
 }
-
 .country__info {
 
 }
