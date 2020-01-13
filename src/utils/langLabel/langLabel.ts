@@ -1,4 +1,4 @@
-import {languageStore} from '../stores';
+import {languageStore} from '../../stores';
 
 /**
  * Функция для получения подписи на текущем языке
@@ -11,5 +11,3 @@ export function langLabel(id: string) {
 	label = label ? label : languageStore.defaultLangLabels.translation[id];
 	return label ? label : '';
 }
-
-

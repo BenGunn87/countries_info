@@ -1,7 +1,7 @@
 import React from "react";
 import {IDictionary} from "../../type/common.type";
 import {inject, observer} from "mobx-react";
-import {LanguageStore} from "../../stores/LanguageStore";
+import {LanguageStore} from "../../stores/LanguageStore/LanguageStore";
 
 /**
  * Компонент для выбора языка интерфейса

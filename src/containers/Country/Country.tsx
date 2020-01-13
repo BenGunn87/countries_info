@@ -1,7 +1,7 @@
 import React from 'react';
 import {inject, observer} from "mobx-react";
 import {CountryView} from "../../components";
-import {langLabel} from '../../utils/langLabel';
+import {langLabel} from '../../utils/langLabel/langLabel';
 import {ICountryProps} from "./Country.type";
 import {SearchView} from "../../components";
 import {LanguageSelect} from '../../components';

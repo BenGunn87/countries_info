@@ -1,5 +1,5 @@
 import React from "react";
-import {langLabel} from '../../utils/langLabel';
+import {langLabel} from '../../utils/langLabel/langLabel';
 import {ICountryViewProps} from "./CountryView.type";
 import {observer} from "mobx-react";
 import './CountryView.css';
